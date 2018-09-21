@@ -3,10 +3,16 @@
 namespace App\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use GuzzleHttp\Client;
 
-class ProductsController
+class ProductsController extends AbstractController
 {
+  
+  /**
+   * @Route("/products/list", name="productsList")
+   */
   public function list()
   {
 
@@ -19,13 +25,34 @@ class ProductsController
 
     if ( $response->getStatusCode() === "200" ) {
       $error = 'ERROR ' . $response->getStatusCode(); 
-      return new Response(
-        '<p class="notification is-danger">' . $error. '</p>'
-      );
+      return $this->render('error.html.twig', array('error' => $error ) );
     } else {
-      return new Response(
-        $response->getBody()->getContents()
+      return $this->render('listing.html.twig', array('listings' => json_decode( $response->getBody()->getContents() ) ) );
+    }
+  }
+
+  /**
+   * @Route("/products/tag/{tag}", name="productsByTag")
+   */
+  public function tag($tag)
+  {
+    $client = new Client([
+      'base_uri'  => 'https://openapi.etsy.com/',
+      'query'     => [ 'api_key' => getenv('ETSY_API_KEY') ]
+    ]);
+
+    $response = $client->request('GET',getenv('ETSY_API_VERSION') . '/shops/' . getenv('ETSY_SHOP_NAME') . '/listings/active', [
+      'query' => [ 'tags' => array( $tag ) ]
+    ]);
+
+    if ( $response->getStatusCode() === "200" ) {
+      $error = 'ERROR ' . $response->getStatusCode(); 
+      return $this->render('error.html.twig', array('error' => $error ) );
+    } else {
+      $data = array(
+        'listings' => json_decode( $response->getBody()->getContents() )
       );
+      return $this->render('listing.html.twig', $data);
     }
   }
 }

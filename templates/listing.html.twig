@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+	{#
+		{{ dump(listings.results) }}
+
+	<br>
+	#}
+
+	{% for listing in listings.results %}
+		<article>
+			<h3 class="title is-3">{{ listing.title }} {{ listing.price }}</h3>
+			
+			<p class="subtitle is-5">{% for tag in listing.tags %}
+				<a href="{{ path('productsByTag', { 'tag': tag|url_encode } ) }}" class="button">{{ tag }}</a>
+			{% endfor %}</p>
+			<p>{{ listing.description }}</p>
+		</article>
+	{% endfor %}
+	
+{% endblock %}
