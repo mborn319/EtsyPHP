@@ -17,11 +17,11 @@ class ProductsController extends AbstractController
   {
 
     $client = new Client([
-      'base_uri'  => 'https://openapi.etsy.com/',
-      'query'     => [ 'api_key' => getenv('ETSY_API_KEY') ]
+      'base_uri'  =>  'https://openapi.etsy.com/'
     ]);
 
-    $response = $client->request('GET',getenv('ETSY_API_VERSION') . '/shops/' . getenv('ETSY_SHOP_NAME') . '/listings/active');
+    $url = getenv('ETSY_API_VERSION') . '/shops/' . getenv('ETSY_SHOP_NAME') . '/listings/active';
+    $response = $client->get($url);
 
     if ( $response->getStatusCode() === "200" ) {
       $error = 'ERROR ' . $response->getStatusCode(); 
@@ -36,13 +36,17 @@ class ProductsController extends AbstractController
    */
   public function tag($tag)
   {
+    
     $client = new Client([
-      'base_uri'  => 'https://openapi.etsy.com/',
-      'query'     => [ 'api_key' => getenv('ETSY_API_KEY') ]
+      'base_uri'  =>  'https://openapi.etsy.com/'
     ]);
 
-    $response = $client->request('GET',getenv('ETSY_API_VERSION') . '/shops/' . getenv('ETSY_SHOP_NAME') . '/listings/active', [
-      'query' => [ 'tags' => array( $tag ) ]
+    $url = getenv('ETSY_API_VERSION') . '/shops/' . getenv('ETSY_SHOP_NAME') . '/listings/active';
+    $response = $client->get($url, [
+      'query' => [
+        'api_key' => getenv('ETSY_API_KEY'),
+        'tags' => array( $tag )
+      ]
     ]);
 
     if ( $response->getStatusCode() === "200" ) {
