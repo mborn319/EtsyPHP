@@ -2,8 +2,7 @@
 
 {% block body %}
 	{#
-		{{ dump(listings.results) }}
-
+		{{ dump(listings) }}
 	<br>
 	#}
 
@@ -17,5 +16,26 @@
 			<p>{{ listing.description|nl2br }}</p>
 		</article>
 	{% endfor %}
+
+	{% if listings.count > listings.results|length %}
+		<nav class="pagination" role="navigation" aria-label="pagination">
+			<a class="pagination-previous">Previous</a>
+			<a class="pagination-next" href="{{ listings.pagination.next_page }}">Next</a>
+
+			<ul class="pagination-list">
+				{% set pages = listings.count / listings.pagination.effective_offset %}
+				
+				{% for page in 1..pages %}
+					<li>
+						{% if page == listings.pagination.effective_page %}
+							<span class="pagination-ellipses" aria-label="Current page">&hellip;</span>
+						{% else %}
+							<a class="pagination-link" aria-label="Go to page {{page}}">{{page}}</a>
+						{% endif %}
+					</li>
+				{% endfor %}
+			</ul>
+		</nav>
+	{% endif %}
 	
 {% endblock %}

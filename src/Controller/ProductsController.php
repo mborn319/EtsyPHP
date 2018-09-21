@@ -7,13 +7,16 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use GuzzleHttp\Client;
 
+define("PERPAGE", 10);
+
 class ProductsController extends AbstractController
 {
   
   /**
    * @Route("/products/list", name="productsList")
+   * @Route("/products/list/{page}", name="productsListByPage")
    */
-  public function list()
+  public function list($page = 1)
   {
 
     $client = new Client([
@@ -21,7 +24,15 @@ class ProductsController extends AbstractController
     ]);
 
     $url = getenv('ETSY_API_VERSION') . '/shops/' . getenv('ETSY_SHOP_NAME') . '/listings/active';
-    $response = $client->get($url);
+    $offset = ( ($page-1) * constant('PERPAGE') ) + 1;
+    $response = $client->get($url, [
+      'query'   => [
+          'api_key' => getenv('ETSY_API_KEY'),
+          'limit'   => constant('PERPAGE'),
+          'offset'  => $offset
+        ]
+      ]
+    );
 
     if ( $response->getStatusCode() === "200" ) {
       $error = 'ERROR ' . $response->getStatusCode(); 
@@ -33,8 +44,9 @@ class ProductsController extends AbstractController
 
   /**
    * @Route("/products/tag/{tag}", name="productsByTag")
+   * @Route("/products/tag/{tag}/{page}", name="productsByTag")
    */
-  public function tag($tag)
+  public function tag($tag, $page = 1)
   {
     
     $client = new Client([
@@ -42,12 +54,16 @@ class ProductsController extends AbstractController
     ]);
 
     $url = getenv('ETSY_API_VERSION') . '/shops/' . getenv('ETSY_SHOP_NAME') . '/listings/active';
+    $offset = ( ($page-1) * constant('PERPAGE') ) + 1;
     $response = $client->get($url, [
-      'query' => [
-        'api_key' => getenv('ETSY_API_KEY'),
-        'tags' => array( $tag )
+      'query'   => [
+          'api_key' => getenv('ETSY_API_KEY'),
+          'limit'   => constant('PERPAGE'),
+          'offset'  => $offset,
+          'tags' => array( $tag )
+        ]
       ]
-    ]);
+    );
 
     if ( $response->getStatusCode() === "200" ) {
       $error = 'ERROR ' . $response->getStatusCode(); 
