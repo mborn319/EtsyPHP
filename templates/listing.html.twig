@@ -14,7 +14,7 @@
 			<p class="subtitle is-5">{% for tag in listing.tags %}
 				<a href="{{ path('productsByTag', { 'tag': tag } ) }}" class="button">{{ tag }}</a>
 			{% endfor %}</p>
-			<p>{{ listing.description }}</p>
+			<p>{{ listing.description|nl2br }}</p>
 		</article>
 	{% endfor %}
 	
