@@ -1,10 +1,9 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-	{#
+{#
 		{{ dump(listings) }}
-	<br>
-	#}
+	<br>#}
 
 	{% for listing in listings.results %}
 		<article>
@@ -21,10 +20,8 @@
 		<nav class="pagination" role="navigation" aria-label="pagination">
 			<a class="pagination-previous">Previous</a>
 			<a class="pagination-next" href="{{ listings.pagination.next_page }}">Next</a>
-
 			<ul class="pagination-list">
-				{% set pages = listings.count / listings.pagination.effective_offset %}
-				
+				{% set pages = listings.count / listings.pagination.effective_limit %}
 				{% for page in 1..pages %}
 					<li>
 						{% if page == listings.pagination.effective_page %}

@@ -6,8 +6,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use GuzzleHttp\Client;
-
-define("PERPAGE", 10);
+use App\Controller\ListingController;
 
 class ProductsController extends AbstractController
 {
@@ -16,23 +15,13 @@ class ProductsController extends AbstractController
    * @Route("/products/list", name="productsList")
    * @Route("/products/list/{page}", name="productsListByPage")
    */
-  public function list($page = 1)
-  {
+  public function list($page = 1) {
+		$etsyAPI = new ListingController();
 
-    $client = new Client([
-      'base_uri'  =>  'https://openapi.etsy.com/'
-    ]);
-
-    $url = getenv('ETSY_API_VERSION') . '/shops/' . getenv('ETSY_SHOP_NAME') . '/listings/active';
-    $offset = ( ($page-1) * constant('PERPAGE') ) + 1;
-    $response = $client->get($url, [
-      'query'   => [
-          'api_key' => getenv('ETSY_API_KEY'),
-          'limit'   => constant('PERPAGE'),
-          'offset'  => $offset
-        ]
-      ]
-    );
+		$response = $etsyAPI->findAllShopListingsActive( array(
+			'page' => $page,
+			'shop_id' => getenv('ETSY_SHOP_NAME')
+		) );
 
     if ( $response->getStatusCode() === "200" ) {
       $error = 'ERROR ' . $response->getStatusCode(); 
@@ -48,22 +37,13 @@ class ProductsController extends AbstractController
    */
   public function tag($tag, $page = 1)
   {
+		$etsyAPI = new ListingController();
+		$response = $etsyAPI->findAllShopListingsActive( array(
+			'tags' => $tag,
+			'page' => $page,
+			'shop_id' => getenv('ETSY_SHOP_NAME')
+		) );
     
-    $client = new Client([
-      'base_uri'  =>  'https://openapi.etsy.com/'
-    ]);
-
-    $url = getenv('ETSY_API_VERSION') . '/shops/' . getenv('ETSY_SHOP_NAME') . '/listings/active';
-    $offset = ( ($page-1) * constant('PERPAGE') ) + 1;
-    $response = $client->get($url, [
-      'query'   => [
-          'api_key' => getenv('ETSY_API_KEY'),
-          'limit'   => constant('PERPAGE'),
-          'offset'  => $offset,
-          'tags' => array( $tag )
-        ]
-      ]
-    );
 
     if ( $response->getStatusCode() === "200" ) {
       $error = 'ERROR ' . $response->getStatusCode(); 
